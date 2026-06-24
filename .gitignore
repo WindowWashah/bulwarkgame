@@ -1,0 +1,20 @@
+# Vercel
+.vercel
+
+# Node
+node_modules
+
+# Build artifacts / local-only
+*.zip
+*.bak
+_check.js
+_integration_spec.md
+
+# Secrets — never commit
+.env
+.env.*
+*.local
+
+# OS
+.DS_Store
+Thumbs.db
