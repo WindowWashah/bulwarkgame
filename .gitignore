@@ -8,7 +8,7 @@ node_modules
 *.zip
 *.bak
 _check.js
-_integration_spec.md
+_*.md
 
 # Secrets — never commit
 .env
