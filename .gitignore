@@ -9,6 +9,7 @@ node_modules
 *.bak
 _check.js
 _*.md
+_*.css
 
 # Secrets — never commit
 .env
