@@ -561,6 +561,51 @@ button.go:hover:not(:disabled){box-shadow:0 0 30px -4px rgba(34,230,255,.85);}
 button.go:disabled{background:rgba(0,0,0,.28);color:var(--muted);box-shadow:none;}
 button.icon{flex:0 0 auto;min-width:48px;font-size:15px;}
 
+/* ---------- active abilities bar ---------- */
+.abilbar{ display:flex; gap:9px; }
+.abil{
+  position:relative; flex:1; min-width:0; overflow:hidden;
+  cursor:pointer; text-align:left;
+  display:flex; align-items:center; gap:9px;
+  font-family:var(--body); color:var(--text);
+  border:1px solid var(--glass-edge); border-left:2px solid var(--ac, var(--cyan));
+  background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,.34));
+  border-radius:0; clip-path:var(--clip-chip); padding:9px 12px;
+  transition:transform .12s var(--ease), border-color .14s var(--ease), box-shadow .14s var(--ease), background .14s var(--ease);
+}
+.abil:hover:not(:disabled){ transform:translateY(-2px); border-color:var(--ac); box-shadow:0 0 18px -6px var(--ac); }
+.abil:active:not(:disabled){ transform:translateY(0); box-shadow:var(--press); }
+.abil:disabled{ cursor:default; opacity:.5; }
+.abil.poor .acost{ color:var(--hot); }
+.abil .akey{
+  flex:none; font-family:var(--mono); font-size:11px; font-weight:700; color:var(--ac, var(--cyan));
+  border:1px solid var(--ac, rgba(34,230,255,.4)); border-radius:5px; padding:1px 6px;
+  background:rgba(0,0,0,.3); text-shadow:0 0 8px var(--ac);
+}
+.abil .abody{ display:flex; flex-direction:column; min-width:0; line-height:1.1; }
+.abil .anm{ font-family:var(--disp); font-size:11px; font-weight:700; letter-spacing:.6px; color:#fff; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.abil .ads{ font-size:9px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.abil .acost{ margin-left:auto; flex:none; font-family:var(--mono); font-size:11px; font-weight:700; color:var(--gold); font-variant-numeric:tabular-nums; text-shadow:0 0 8px rgba(255,210,74,.4); }
+.abil .sweep{
+  position:absolute; inset:0; pointer-events:none; z-index:0; opacity:0;
+  background:conic-gradient(rgba(6,4,16,.62) calc(var(--frac,0)*360deg), transparent 0);
+  transition:opacity .15s var(--ease);
+}
+.abil.cd .sweep{ opacity:1; }
+.abil.cd{ border-left-color:var(--muted); }
+.abil > *:not(.sweep){ position:relative; z-index:1; }
+@media (max-width:600px){ .abil .ads{ display:none; } }
+@media (max-width:430px){ .abilbar{ flex-wrap:wrap; } .abil{ flex:1 1 46%; } }
+
+/* board flash for Cryo/Rally tells */
+#abilFx{ position:absolute; inset:0; z-index:7; pointer-events:none; opacity:0; }
+#abilFx.go{
+  background:radial-gradient(120% 120% at 50% 50%, transparent 30%, var(--fxc, #22e6ff) 160%);
+  mix-blend-mode:screen; animation:abilFxPulse .45s var(--ease) 1;
+}
+@keyframes abilFxPulse{ 0%{opacity:.6;} 100%{opacity:0;} }
+@media (prefers-reduced-motion: reduce){ #abilFx.go{ animation:none; } }
+
 /* ---------- selection / upgrade panel ---------- */
 .panel{
   margin-top:12px;
@@ -584,6 +629,28 @@ button.icon{flex:0 0 auto;min-width:48px;font-size:15px;}
 .stxt{display:flex;gap:12px;font-family:var(--mono);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;flex-wrap:wrap;}
 .stxt b{color:#fff;font-weight:700;}
 .spx{color:var(--gold);text-shadow:0 0 8px rgba(255,210,74,.4);}
+.tgtbtn{
+  cursor:pointer;
+  align-self:flex-start;
+  margin-top:2px;
+  border:1px solid var(--glass-edge);
+  background:linear-gradient(180deg, rgba(34,230,255,.07), rgba(0,0,0,.3));
+  color:var(--text);
+  border-radius:0;
+  clip-path:var(--clip-chip);
+  padding:6px 11px;
+  font-family:var(--body);
+  font-size:10.5px;
+  font-weight:600;
+  letter-spacing:.4px;
+  text-transform:uppercase;
+  white-space:nowrap;
+  transition:transform .12s var(--ease), border-color .14s var(--ease), box-shadow .14s var(--ease), background .14s var(--ease);
+}
+.tgtbtn b{color:var(--cyan);font-weight:700;text-shadow:0 0 8px rgba(34,230,255,.45);}
+.tgtbtn .tgtarrow{color:var(--mag);font-size:9px;margin-left:1px;}
+.tgtbtn:hover{transform:translateY(-2px);border-color:var(--cyan);box-shadow:0 0 16px -6px var(--cyan);background:linear-gradient(180deg, rgba(34,230,255,.12), rgba(0,0,0,.32));}
+.tgtbtn:active{transform:translateY(0);box-shadow:var(--press);}
 
 .ups{display:flex;gap:9px;flex:1;flex-wrap:wrap;min-width:200px;}
 .upg{
@@ -839,7 +906,7 @@ button.icon{flex:0 0 auto;min-width:48px;font-size:15px;}
         <div class="inner">
           <h2>Siege of the Keep</h2>
           <p>Build towers on the dark tiles to stop the horde before it reaches your keep. Earn gold for kills, then click any tower to invest in <b>one of its two upgrade paths</b>.</p>
-          <div class="notes"><b>Counters matter:</b> Wraiths fly (only Tesla, Arcane, Ballista, Tempest &amp; Prism hit air) &middot; armored foes shrug off chip damage, so use heavy hits, poison or fire &middot; Acolytes heal the horde &middot; Hollows split when slain.<br><b>Status combos:</b> a heavy hit on a <b>slowed</b> foe <b>Shatters</b> for +50% &middot; a foe both <b>burning &amp; poisoned</b> <b>Detonates</b> in a blast (mix Pyre + Venom) &middot; Tesla bolts <b>Conduct</b> through chilled foes for +30% and arc farther (pair with Frost).<br><b>Link towers:</b> place two adjacent (even diagonally) for +6% fire rate each (max +24%); matching pairs grant named bonuses — Archer+Cannon (Volley Line), Frost+Venom (Toxic Chill), Tesla+Prism (Resonance), Cannon+Pyre (Firestorm Battery), Ballista+Arcane (Siege Focus).</div>
+          <div class="notes"><b>Counters matter:</b> Wraiths fly (only Tesla, Arcane, Ballista, Tempest &amp; Prism hit air) &middot; armored foes shrug off chip damage, so use heavy hits, poison or fire &middot; Acolytes heal the horde &middot; Hollows split when slain. &middot; Sentinels raise a self-healing ward &mdash; burst it down with heavy hits or bleed through it with poison/fire<br><b>Status combos:</b> a heavy hit on a <b>slowed</b> foe <b>Shatters</b> for +50% &middot; a foe both <b>burning &amp; poisoned</b> <b>Detonates</b> in a blast (mix Pyre + Venom) &middot; Tesla bolts <b>Conduct</b> through chilled foes for +30% and arc farther (pair with Frost).<br><b>Link towers:</b> place two adjacent (even diagonally) for +6% fire rate each (max +24%); matching pairs grant named bonuses — Archer+Cannon (Volley Line), Frost+Venom (Toxic Chill), Tesla+Prism (Resonance), Cannon+Pyre (Firestorm Battery), Ballista+Arcane (Siege Focus).</div>
           <div class="sel-group"><span class="sel-lab">Choose your trial</span><div class="pills" id="diffSel"></div></div>
           <div class="sel-group"><span class="sel-lab">Choose your battlefield</span><div class="pills" id="mapSel"></div></div>
           <button class="play-btn" id="playBtn">Begin the Defense</button>
@@ -1075,6 +1142,7 @@ const ENEMIES = {
   flying:    {name:'Wraith',    color:'#9d7af0', hp:70,   speed:94,  reward:14,  radius:11, flying:true},
   healer:    {name:'Acolyte',   color:'#6be8a0', hp:105,  speed:56,  reward:24,  radius:12, heal:22, healRange:82},
   splitter:  {name:'Hollow',    color:'#e89a4d', hp:95,   speed:60,  reward:16,  radius:13, split:4},
+  sentinel:  {name:'Sentinel',  color:'#5bd6c4', hp:130,  speed:52,  reward:22,  radius:13, shield:110},
   shard:     {name:'Shard',     color:'#f0b56d', hp:22,   speed:136, reward:3,   radius:7},
   boss:      {name:'Warlord',   color:'#d45fd6', hp:1500, speed:36,  reward:180, radius:21, boss:true, leak:3},
   juggernaut:{name:'Juggernaut',color:'#c46fe0', hp:3000, speed:30,  reward:330, radius:25, boss:true, armor:14, regen:48, leak:4},
@@ -1092,7 +1160,8 @@ function reset(){
   towers=[]; enemies=[]; projectiles=[]; sparks=[]; rings=[]; floaters=[]; bolts=[]; pendingSpawns=[];
   spawnQueue=[]; spawnTimer=0; waveInProgress=false;
   selType=null; selTower=null; hoverCell=null; paused=false; speed=1; keepFlash=0;
-  syncShop(); updateHUD(); renderSelection();
+  resetAbilities();
+  syncShop(); updateHUD(); renderSelection(); buildAbilityBar();
 }
 
 const canvas = document.getElementById('game');
@@ -1122,6 +1191,7 @@ function buildWave(n){
   if(n>=6) push('flying',   2 + Math.floor((n-5)*0.7));
   if(n>=7) push('splitter', 1 + Math.floor((n-6)*0.45));
   if(n>=8) push('healer',   Math.max(1, Math.floor((n-6)*0.3)));
+  if(n>=9) push('sentinel', 1 + Math.floor((n-8)*0.5));
   for(let i=list.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const tmp=list[i]; list[i]=list[j]; list[j]=tmp; }
   if(bossWave){ const type=(n%10===0)?'juggernaut':'boss'; const count=n>=20?2:1; for(let i=0;i<count;i++) list.push(type); }
   return list;
@@ -1148,21 +1218,107 @@ function completeWave(){
 }
 function makeEnemy(type,x,y,wp,dist){
   const base=ENEMIES[type], isBoss=!!base.boss, d=D();
-  const hpScale=Math.pow(d.hpGrow,wave-1), hp=Math.round(base.hp*hpScale), spdMul=1+(wave-1)*d.spd;
+  const hpScale=Math.pow(d.hpGrow,wave-1);
+  const hp=Math.round(base.hp*hpScale*(isBoss?BOSS_HP_FACTOR:1));
+  const spdMul=1+(wave-1)*d.spd;
+  const shieldFull=Math.round((base.shield||0)*Math.pow(d.hpGrow,(wave-1)*0.45));
   return {type:type,color:base.color,radius:base.radius,boss:isBoss,flying:!!base.flying,armor:base.armor||0,
-    heal:base.heal||0,healRange:base.healRange||0,split:base.split||0,regen:Math.round((base.regen||0)*hpScale),leakDmg:base.leak||1,
+    heal:base.heal||0,healRange:base.healRange||0,split:base.split||0,regen:Math.round((base.regen||0)*Math.pow(hpScale,REGEN_EXP)),leakDmg:base.leak||1,
+    shieldMax:shieldFull,shield:shieldFull,shieldRegenCd:0,
     x:x,y:y,wp:wp,dist:dist,hp:hp,maxHp:hp,speed:base.speed*spdMul,reward:Math.round(base.reward*(1+(wave-1)*0.03)*d.reward),
-    slowTimer:0,slowMul:1,poisonDps:0,poisonTimer:0,burnDps:0,burnTimer:0,detoCd:0,poisonRateMul:1,bob:Math.random()*TAU,alive:true,leaked:false};
+    slowTimer:0,slowMul:1,poisonDps:0,poisonTimer:0,burnDps:0,burnTimer:0,detoCd:0,poisonRateMul:1,
+    woundTimer:0,woundMul:1,woundMulTimer:0,bob:Math.random()*TAU,alive:true,leaked:false};
 }
 function spawnEnemy(type){ enemies.push(makeEnemy(type,WPX[0].x,WPX[0].y,1,0)); }
+
+// ===================== ACTIVE ABILITIES (gold clutch powers) =====================
+// Self-contained. Smite WRITES the WOUND contract fields e.woundTimer/e.woundMul.
+const ABILITIES = {
+  smite:{ key:'q', name:'Smite', cost:120, cd:18, color:'#ff5e7a', desc:'Nuke strongest' },
+  cryo: { key:'e', name:'Cryo',  cost:90,  cd:22, color:'#22e6ff', desc:'Freeze all' },
+  rally:{ key:'r', name:'Rally', cost:140, cd:40, color:'#ffd24a', desc:'+3 lives' },
+};
+const ABIL_ORDER = ['smite','cryo','rally'];
+let abilCd = Object.create(null);
+let abilFlash = 0;
+function resetAbilities(){ abilCd = Object.create(null); for(const k of ABIL_ORDER) abilCd[k]=0; abilFlash=0; }
+function tickAbilities(dt){
+  for(const k of ABIL_ORDER){ if(abilCd[k]>0) abilCd[k]=Math.max(0,abilCd[k]-dt); }
+  if(abilFlash>0) abilFlash=Math.max(0,abilFlash-dt);
+}
+function abilReady(k){ const a=ABILITIES[k]; return !!a && started && !gameOver && (abilCd[k]||0)<=0 && gold>=a.cost; }
+function strongestEnemy(){ let best=null,bh=-1; for(const e of enemies){ if(!e.alive) continue; if(e.hp>bh){ bh=e.hp; best=e; } } return best; }
+function castAbility(k){
+  if(!started || gameOver) return false;
+  const a=ABILITIES[k]; if(!a) return false;
+  if((abilCd[k]||0)>0){ snd.deny(); return false; }
+  if(gold<a.cost){ snd.deny(); flash(); return false; }
+  let did=false;
+  if(k==='smite'){
+    const e=strongestEnemy(); if(!e){ snd.deny(); return false; }
+    damage(e, SMITE_DMG, {pierce:true, shieldPierce:true});
+    if(e.alive){ e.woundTimer=Math.max(e.woundTimer||0,SMITE_WOUND_DUR); e.woundMulTimer=Math.max(e.woundMulTimer||0,SMITE_WOUND_DUR); e.woundMul=Math.max(e.woundMul||1,SMITE_WOUND_MUL); }
+    rings.push({x:e.x,y:e.y,r:e.radius+4,maxR:e.radius+46,life:.4,maxLife:.4,color:a.color});
+    burst(e.x,e.y,a.color,20); addFloater(e.x,e.y-16,'SMITE',a.color,.9,18);
+    if(snd.boom) snd.boom();
+    did=true;
+  } else if(k==='cryo'){
+    let n=0;
+    for(const e of enemies){ if(!e.alive) continue;
+      e.slowTimer=Math.max(e.slowTimer||0,CRYO_DUR); e.slowMul=Math.min(e.slowMul||1,CRYO_SLOWMUL);
+      if(n<24){ rings.push({x:e.x,y:e.y,r:e.radius,maxR:e.radius+18,life:.35,maxLife:.35,color:a.color}); }
+      n++;
+    }
+    if(!n){ snd.deny(); return false; }
+    flashBoard(a.color); addFloater(KEEP.x-40,KEEP.y-40,'CRYO',a.color,1,18); snd.pulse();
+    did=true;
+  } else if(k==='rally'){
+    lives+=RALLY_LIVES; flashBoard(a.color); keepFlash=Math.max(keepFlash,0.4);
+    addFloater(KEEP.x-18,KEEP.y-30,'+'+RALLY_LIVES+' lives',a.color,1.3,18);
+    if(snd.wave) snd.wave();
+    did=true;
+  }
+  if(!did) return false;
+  gold-=a.cost; abilCd[k]=a.cd; updateHUD(); syncAbilityBar(); return true;
+}
+// ===================== END ACTIVE ABILITIES ======================
 
 const SHATTER_MIN = 40, SHATTER_BONUS = 0.5;
 const DETO_RADIUS = 42, DETO_DMG = 34;
 const CONDUCT_DMG = 1.3, CONDUCT_ARC = 1.45;
+// ===================== MERGED TUNABLES (sim-tunable) =====================
+// --- BOSS REGEN / WOUND (regen is a counterable status, not a DPS floor) ---
+const WOUND_DUR          = 0.6;  // s a normal hit suppresses regen (>= a fast tower's reload)
+const HEAVY_WOUND_DUR    = 1.6;  // s a heavy single hit suppresses regen (covers slow boss-killers)
+const HEAVY_THRESHOLD    = 120;  // post-armor damage amount that counts as a "heavy" hit
+const REGEN_EXP          = 0.5;  // sub-linear exponent applied to hpScale for regen scaling
+const REGEN_WOUNDED_MUL  = 0.0;  // regen multiplier while wounded (0 = fully suppressed)
+const BOSS_HP_FACTOR     = 0.8;  // boss/juggernaut HP softener (sim-tuned: wave-30 double-jugg ~8 focused maxed towers)
+// --- SENTINEL (Warden-shield enemy) ---
+const SENTINEL_SHIELD_REGEN_DELAY = 3.0;   // s of no shield-hit before the ward starts rebuilding
+const SENTINEL_SHIELD_REGEN_RATE  = 0.3;   // fraction of shieldMax restored per second while regenerating
+// --- ACTIVE ABILITIES (gold clutch powers) ---
+const SMITE_DMG = 900, SMITE_WOUND_DUR = 6, SMITE_WOUND_MUL = 1.35; // armor-ignored nuke + long wound amp
+const CRYO_DUR = 3.2, CRYO_SLOWMUL = 0.12;                          // near-freeze all enemies
+const RALLY_LIVES = 3;                                              // lives repaired
+// ===================== END MERGED TUNABLES =====================
 function damage(e,amount,opts){
   if(!e.alive) return;
   let dmg=amount; const isDot=opts&&opts.dot, pierce=opts&&opts.pierce, combo=opts&&opts.combo;
   if(e.armor && !isDot && !pierce) dmg=Math.max(1,dmg-e.armor);
+  const heavyRef=dmg;   // post-armor hit size for the "heavy" wound classification (pre shield/amp/shatter)
+  // SENTINEL SHIELD: discrete hits drain the ward first; DoT (poison/burn) and Smite (shieldPierce) bypass it.
+  if(e.shield>0 && !isDot && !(opts&&opts.shieldPierce) && dmg>0){
+    e.shieldRegenCd=SENTINEL_SHIELD_REGEN_DELAY;
+    if(dmg<=e.shield){ e.shield-=dmg;
+      rings.push({x:e.x,y:e.y,r:e.radius+5,maxR:e.radius+9,life:.18,maxLife:.18,color:'#9ff0e6'});
+      return; }
+    dmg-=e.shield; e.shield=0;
+    burst(e.x,e.y,'#9ff0e6',8);
+    addFloater(e.x,e.y-13,'WARD BROKEN','#9ff0e6',.6,12);
+  }
+  // WOUND amplify (Smite): the +35% lasts its own bounded window (woundMulTimer), not every-hit-refreshed.
+  if(e.woundMulTimer>0 && e.woundMul>1) dmg*=e.woundMul;
   if(combo && e.slowTimer>0 && dmg>=SHATTER_MIN){
     dmg+=dmg*SHATTER_BONUS;
     e.slowTimer=0; e.slowMul=1;
@@ -1171,6 +1327,8 @@ function damage(e,amount,opts){
     addFloater(e.x,e.y-13,'SHATTER','#bfe8ff',.7,15);
     if(snd.boom) snd.boom();
   }
+  // WOUND set: any damage suppresses regen briefly; heavy single hits suppress longer.
+  e.woundTimer=Math.max(e.woundTimer||0, heavyRef>=HEAVY_THRESHOLD ? HEAVY_WOUND_DUR : WOUND_DUR);
   e.hp-=dmg; if(e.hp<=0) kill(e);
 }
 function comboBlast(x,y,radius,dmg,color,air){
@@ -1197,6 +1355,7 @@ function applyStatus(e,p){
   if(p.slowDur){ e.slowTimer=p.slowDur; e.slowMul=p.slowMul; }
   if(p.dot){ e.poisonDps=Math.min(MAX_POISON,e.poisonDps+p.dot); e.poisonTimer=p.dotDur; e.poisonRateMul=Math.max(e.poisonRateMul||1,p.poisonRateMul||1); }
   if(p.burn){ e.burnDps=Math.max(e.burnDps,p.burn); e.burnTimer=p.burnDur; }
+  if(p.dot||p.burn) e.woundTimer=Math.max(e.woundTimer||0, WOUND_DUR);
   if(e.alive && e.burnTimer>0 && e.poisonTimer>0 && (e.detoCd||0)<=0){
     e.detoCd=0.7;
     rings.push({x:e.x,y:e.y,r:10,maxR:DETO_RADIUS+16,life:.34,maxLife:.34,color:'#ffb14d'});
@@ -1207,11 +1366,27 @@ function applyStatus(e,p){
     if(snd.boom) snd.boom();
   }
 }
+const TARGET_MODES=['first','last','strong','close'];
+const TARGET_LABELS={first:'First',last:'Last',strong:'Strong',close:'Close'};
+function cycleTargetMode(t){ if(!t) return; const i=TARGET_MODES.indexOf(t.targetMode||'first'); t.targetMode=TARGET_MODES[(i+1)%TARGET_MODES.length]; }
 function acquire(t,n){
   const rng = t.range * ((t.syn&&t.syn.rangeMul)||1), r2 = rng*rng, arr=[];
   for(const e of enemies){ if(!e.alive||!canHit(t,e)) continue; const dx=e.x-t.x,dy=e.y-t.y; if(dx*dx+dy*dy<=r2) arr.push(e); }
-  arr.sort(function(a,b){ return b.dist-a.dist; });
-  return n===1 ? (arr.length?[arr[0]]:[]) : arr.slice(0,n);
+  const mode = t.targetMode || 'first';
+  if(n===1){
+    if(!arr.length) return [];
+    let best=arr[0];
+    if(mode==='last'){ for(let i=1;i<arr.length;i++) if(arr[i].dist<best.dist) best=arr[i]; }
+    else if(mode==='strong'){ for(let i=1;i<arr.length;i++) if(arr[i].hp>best.hp) best=arr[i]; }
+    else if(mode==='close'){ const tx=t.x,ty=t.y; let bd=(best.x-tx)*(best.x-tx)+(best.y-ty)*(best.y-ty); for(let i=1;i<arr.length;i++){ const dx=arr[i].x-tx,dy=arr[i].y-ty,d=dx*dx+dy*dy; if(d<bd){bd=d;best=arr[i];} } }
+    else { for(let i=1;i<arr.length;i++) if(arr[i].dist>best.dist) best=arr[i]; } // 'first'
+    return [best];
+  }
+  if(mode==='last'){ arr.sort(function(a,b){ return a.dist-b.dist; }); }
+  else if(mode==='strong'){ arr.sort(function(a,b){ return b.hp-a.hp; }); }
+  else if(mode==='close'){ const tx=t.x,ty=t.y; arr.sort(function(a,b){ const ax=a.x-tx,ay=a.y-ty,bx=b.x-tx,by=b.y-ty; return (ax*ax+ay*ay)-(bx*bx+by*by); }); }
+  else { arr.sort(function(a,b){ return b.dist-a.dist; }); }
+  return arr.slice(0,n);
 }
 function fireProjectile(t,target){
   const s = t.syn || null;
@@ -1312,6 +1487,7 @@ function linkRate(t){
 }
 
 function update(dt){
+  tickAbilities(dt);
   if(waveInProgress){
     if(spawnQueue.length){ spawnTimer-=dt; if(spawnTimer<=0){ const type=spawnQueue.shift(); spawnEnemy(type); spawnTimer=gapFor(type); } }
     else if(enemies.length===0) completeWave();
@@ -1329,7 +1505,16 @@ function update(dt){
     if(e.poisonTimer>0){ const prm=e.poisonRateMul||1; damage(e,e.poisonDps*prm*dt,{dot:true}); e.poisonTimer-=dt; if(e.poisonTimer<=0){ e.poisonDps=0; e.poisonRateMul=1; } }
     if(e.alive&&e.burnTimer>0){ damage(e,e.burnDps*dt,{dot:true}); e.burnTimer-=dt; if(e.burnTimer<=0) e.burnDps=0; }
     if(e.detoCd>0) e.detoCd-=dt;
-    if(e.alive&&e.regen) e.hp=Math.min(e.maxHp,e.hp+e.regen*dt);
+    if(e.woundTimer>0) e.woundTimer-=dt;
+    if(e.woundMulTimer>0){ e.woundMulTimer-=dt; if(e.woundMulTimer<=0) e.woundMul=1; }
+    if(e.alive&&e.regen){
+      const regenMul=(e.woundTimer>0)?REGEN_WOUNDED_MUL:1;
+      if(regenMul>0) e.hp=Math.min(e.maxHp,e.hp+e.regen*regenMul*dt);
+    }
+    if(e.alive&&e.shieldMax>0){
+      if(e.shieldRegenCd>0) e.shieldRegenCd-=dt;
+      else if(e.shield<e.shieldMax) e.shield=Math.min(e.shieldMax, e.shield + e.shieldMax*SENTINEL_SHIELD_REGEN_RATE*dt);
+    }
   }
   for(const h of enemies){ if(!h.alive||!h.heal) continue;
     for(const e of enemies){ if(e===h||!e.alive||e.hp>=e.maxHp) continue; const dx=e.x-h.x,dy=e.y-h.y; if(dx*dx+dy*dy<=h.healRange*h.healRange) e.hp=Math.min(e.maxHp,e.hp+h.heal*dt); } }
@@ -1398,6 +1583,7 @@ function update(dt){
     if(!e.alive) enemies.splice(i,1);
   }
   if(keepFlash>0) keepFlash=Math.max(0,keepFlash-dt);
+  syncAbilityBar();
 }
 function endGame(){
   gameOver=true; best=Math.max(best,score);
@@ -1617,6 +1803,10 @@ function drawEnemies(time){
     else if(e.type==='healer'){ ctx.beginPath(); ctx.arc(e.x,dy,e.radius,0,TAU); ctx.fill(); const ap=0.4+0.3*Math.sin(time/220+e.bob); ctx.strokeStyle='rgba(107,232,160,'+ap+')'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(e.x,dy,e.healRange,0,TAU); ctx.stroke(); ctx.fillStyle='#0f3a26'; ctx.fillRect(e.x-1.5,dy-6,3,12); ctx.fillRect(e.x-6,dy-1.5,12,3); }
     else if(e.type==='splitter'){ polygon(e.x,dy,e.radius,5,time/2500); ctx.fill(); ctx.strokeStyle='rgba(60,30,10,0.6)'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(e.x-e.radius*0.5,dy); ctx.lineTo(e.x+e.radius*0.5,dy); ctx.moveTo(e.x,dy-e.radius*0.5); ctx.lineTo(e.x,dy+e.radius*0.4); ctx.stroke(); }
     else if(e.boss){ polygon(e.x,dy,e.radius,8,time/1400); ctx.fill(); if(e.armor){ ctx.strokeStyle='#f0d8ff'; ctx.lineWidth=3; polygon(e.x,dy,e.radius+2,8,-time/1800); ctx.stroke(); } ctx.fillStyle='#ffe1f6'; ctx.beginPath(); ctx.arc(e.x,dy,e.radius*0.42,0,TAU); ctx.fill(); }
+    else if(e.type==='sentinel'){ ctx.beginPath(); ctx.arc(e.x,dy,e.radius,0,TAU); ctx.fill(); ctx.fillStyle=shade(e.color,-.4); ctx.beginPath(); ctx.arc(e.x,dy,e.radius*0.5,0,TAU); ctx.fill();
+      const frac=e.shieldMax>0?e.shield/e.shieldMax:0;
+      if(frac>0){ ctx.strokeStyle=hexA('#9ff0e6',0.35+0.5*frac); ctx.lineWidth=2.2; polygon(e.x,dy,e.radius+5,6,time/1600); ctx.stroke(); }
+      if(e.shieldMax>0 && e.shieldRegenCd<=0 && e.shield<e.shieldMax){ ctx.strokeStyle=hexA('#bffff5',0.25+0.25*Math.sin(time/90)); ctx.lineWidth=1.4; polygon(e.x,dy,e.radius+8,6,-time/1200); ctx.stroke(); } }
     else { ctx.beginPath(); ctx.arc(e.x,dy,e.radius,0,TAU); ctx.fill(); }
     ctx.shadowBlur=0;
     if(!e.boss && e.type!=='healer'){ ctx.strokeStyle='rgba(0,0,0,0.35)'; ctx.lineWidth=2; if(e.type==='tank'||e.type==='splitter') polygon(e.x,dy,e.radius,e.type==='tank'?6:5,time/2000); else { ctx.beginPath(); ctx.arc(e.x,dy,e.radius,0,TAU); } ctx.stroke(); }
@@ -1626,6 +1816,21 @@ function drawEnemies(time){
     if(e.slowTimer>0){ ctx.strokeStyle='rgba(89,184,239,0.85)'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(e.x,dy,ring,0,TAU); ctx.stroke(); ring+=3; }
     if(e.poisonTimer>0){ ctx.strokeStyle='rgba(155,232,107,0.85)'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(e.x,dy,ring,0,TAU); ctx.stroke(); ring+=3; }
     if(e.burnTimer>0){ ctx.strokeStyle='rgba(255,122,77,0.9)'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(e.x,dy,ring,0,TAU); ctx.stroke(); }
+    if(e.regen){
+      const wounded=e.woundTimer>0;
+      const hr=e.radius+6;
+      if(wounded){
+        ctx.strokeStyle='rgba(120,140,160,0.5)'; ctx.lineWidth=2;
+        ctx.beginPath(); ctx.arc(e.x,dy,hr,0,TAU); ctx.stroke();
+        const s=hr*0.7;
+        ctx.beginPath(); ctx.moveTo(e.x-s,dy-s); ctx.lineTo(e.x+s,dy+s); ctx.stroke();
+      } else if(e.hp<e.maxHp){
+        const ap=0.45+0.3*Math.sin(time/180+e.bob);
+        ctx.strokeStyle='rgba(111,217,138,'+ap+')'; ctx.lineWidth=2;
+        ctx.beginPath(); ctx.arc(e.x,dy,hr,0,TAU); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(e.x,dy-hr-3); ctx.lineTo(e.x,dy-hr+3); ctx.moveTo(e.x-3,dy-hr); ctx.lineTo(e.x+3,dy-hr); ctx.stroke();
+      }
+    }
     if(e.hp<e.maxHp){ const w=e.radius*2.4,h=4,bx=e.x-w/2,by=dy-e.radius-9; ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(bx-1,by-1,w+2,h+2); const ratio=Math.max(0,e.hp/e.maxHp); ctx.fillStyle=ratio>0.5?'#6fd98a':ratio>0.25?'#ecc24f':'#ef6c5a'; ctx.fillRect(bx,by,w*ratio,h); }
   }
 }
@@ -1673,6 +1878,7 @@ function updateHUD(){
   const els=document.querySelectorAll('.twr');
   els.forEach(function(el){ el.classList.toggle('poor', gold<TOWERS[el.dataset.type].cost); });
   if(selTower) renderSelection();
+  syncAbilityBar();
 }
 function buildShop(){
   const shop=document.getElementById('shop'); shop.innerHTML='';
@@ -1687,6 +1893,47 @@ function buildShop(){
   });
 }
 function syncShop(){ document.querySelectorAll('.twr').forEach(function(el){ el.classList.toggle('sel', el.dataset.type===selType); }); }
+function flashBoard(color){
+  abilFlash=0.45;
+  const bw=document.getElementById('boardWrap'); if(!bw) return;
+  let fx=document.getElementById('abilFx');
+  if(!fx){ fx=document.createElement('div'); fx.id='abilFx'; bw.appendChild(fx); }
+  fx.style.setProperty('--fxc', color||'#22e6ff');
+  fx.classList.remove('go'); void fx.offsetWidth; fx.classList.add('go');
+}
+function buildAbilityBar(){
+  if(document.getElementById('abilBar')){ syncAbilityBar(); return; }
+  const controls=document.querySelector('.controls'); if(!controls) return;
+  const bar=document.createElement('div'); bar.className='abilbar'; bar.id='abilBar';
+  ABIL_ORDER.forEach(function(k){
+    const a=ABILITIES[k];
+    const b=document.createElement('button');
+    b.className='abil'; b.id='abil_'+k; b.dataset.k=k;
+    b.style.setProperty('--ac', a.color);
+    b.innerHTML='<span class="sweep" aria-hidden="true"></span>'+
+      '<span class="akey">'+a.key.toUpperCase()+'</span>'+
+      '<span class="abody"><span class="anm">'+a.name+'</span><span class="ads">'+a.desc+'</span></span>'+
+      '<span class="acost">'+a.cost+'g</span>';
+    b.addEventListener('click',function(){ audio.kick(); castAbility(k); });
+    bar.appendChild(b);
+  });
+  controls.appendChild(bar);
+  syncAbilityBar();
+}
+function syncAbilityBar(){
+  const bar=document.getElementById('abilBar'); if(!bar) return;
+  ABIL_ORDER.forEach(function(k){
+    const a=ABILITIES[k], b=document.getElementById('abil_'+k); if(!b) return;
+    const cd=abilCd[k]||0, onCd=cd>0, poor=gold<a.cost, live=started&&!gameOver;
+    b.disabled = !live || onCd || poor;
+    b.classList.toggle('cd', onCd);
+    b.classList.toggle('poor', !onCd && poor);
+    const sweep=b.querySelector('.sweep');
+    if(sweep){ const frac=onCd? Math.max(0,Math.min(1,cd/a.cd)) : 0; sweep.style.setProperty('--frac', frac); }
+    const cost=b.querySelector('.acost');
+    if(cost) cost.textContent = onCd ? Math.ceil(cd)+'s' : (a.cost+'g');
+  });
+}
 function selectType(key){ selType=(selType===key)?null:key; selTower=null; syncShop(); renderSelection(); }
 function buildDiffSel(){ const el=document.getElementById('diffSel'); el.innerHTML=''; DIFFS.forEach(function(d,i){ const p=document.createElement('div'); p.className='pill'+(i===diffIndex?' diffsel':''); p.innerHTML='<span class="pn">'+d.name+'</span><span class="pd">'+d.desc+'</span>'; p.onclick=function(){ diffIndex=i; buildDiffSel(); updateHUD(); if(typeof Cloud!=='undefined') Cloud.onSettingsChanged(); }; el.appendChild(p); }); }
 function buildMapSel(){ const el=document.getElementById('mapSel'); el.innerHTML=''; MAPS.forEach(function(m,i){ const p=document.createElement('div'); p.className='pill mappill'+(i===mapIndex?' mapsel':''); p.innerHTML='<span class="sw" style="background:'+m.pal.accent+';color:'+m.pal.accent+'"></span><span class="pn">'+m.name+'</span>'; p.onclick=function(){ mapIndex=i; loadMap(i); buildMapSel(); updateHUD(); if(typeof Cloud!=='undefined') Cloud.onSettingsChanged(); }; el.appendChild(p); }); }
@@ -1784,13 +2031,15 @@ function renderSelection(){
   }
   panel.innerHTML =
     '<div class="phead"><div class="ttl"><span class="dot" style="background:'+t.color+';color:'+t.color+'"></span>'+a.name+(t.air?' <span class="airtag">◦ air</span>':'')+'</div>'+
-    '<div class="stxt"><span>DMG <b>'+Math.round(t.dmg)+'</b></span><span>RNG <b>'+Math.round(t.range)+'</b></span>'+rateStr+(sp.length?'<span class="spx">'+sp.join(' · ')+'</span>':'')+'</div></div>'+
+    '<div class="stxt"><span>DMG <b>'+Math.round(t.dmg)+'</b></span><span>RNG <b>'+Math.round(t.range)+'</b></span>'+rateStr+(sp.length?'<span class="spx">'+sp.join(' · ')+'</span>':'')+'</div>'+
+    '<button class="tgtbtn" id="tgtBtn" title="Targeting priority (press T)">Target: <b>'+(TARGET_LABELS[t.targetMode||'first'])+'</b> <span class="tgtarrow">▸</span></button></div>'+
     '<div class="ups">'+btn('a')+btn('b')+'</div>'+
     synStr+
     '<button class="sell" id="sellBtn">Sell · +'+refund+'g</button>';
   panel.classList.add('show');
   const ua=document.getElementById('upg_a'); if(ua) ua.onclick=function(){ buyUpgrade('a'); };
   const ub=document.getElementById('upg_b'); if(ub) ub.onclick=function(){ buyUpgrade('b'); };
+  const tb=document.getElementById('tgtBtn'); if(tb) tb.onclick=function(){ audio.kick(); cycleTargetMode(selTower); renderSelection(); };
   document.getElementById('sellBtn').onclick=sellSelected;
 }
 
@@ -1809,7 +2058,7 @@ function addTower(type,col,row){
     arcaneBurn:false, overcharged:false, siegeBurn:false, executioner:false,
     links:[], syn:null,
     income:a.income||0, interval:a.interval||4, intRate:0, intCap:0, waveBonus:0, payTimer:0,
-    angle:-Math.PI/2, cool:0, aTier:0, bTier:0, invested:a.cost, flashT:0 };
+    angle:-Math.PI/2, cool:0, aTier:0, bTier:0, invested:a.cost, flashT:0, targetMode:'first' };
   towers.push(t);
   return t;
 }
@@ -1839,7 +2088,7 @@ function serializeRun(){
   if(!canSnapshot()) return null;
   const tw=[];
   for(const t of towers){
-    tw.push({ type:t.type, col:t.col, row:t.row, a:t.aTier|0, b:t.bTier|0 });
+    tw.push({ type:t.type, col:t.col, row:t.row, a:t.aTier|0, b:t.bTier|0, tm:t.targetMode||'first' });
   }
   return { v:1, diffIndex:diffIndex, mapIndex:mapIndex, gold:gold, lives:lives, wave:wave, score:score, towers:tw };
 }
@@ -1878,6 +2127,7 @@ function restoreRun(snap){
     if(!t) continue;
     replayBranch(t, 'a', s.a);
     replayBranch(t, 'b', s.b);
+    if(t.kind!=='mint' && typeof s.tm==='string' && TARGET_MODES.indexOf(s.tm)>=0) t.targetMode=s.tm;
   }
 
   gold  = (typeof snap.gold==='number')  ? snap.gold  : gold;
@@ -1927,6 +2177,10 @@ document.addEventListener('keydown', function(e){
   else if(k==='escape'){ selType=null; selTower=null; syncShop(); renderSelection(); }
   else if(k===' '){ e.preventDefault(); startWave(); }
   else if(k==='p') togglePause();
+  else if(k==='t'){ if(selTower && selTower.kind!=='mint'){ cycleTargetMode(selTower); renderSelection(); } }
+  else if(k==='q') castAbility('smite');
+  else if(k==='e') castAbility('cryo');
+  else if(k==='r') castAbility('rally');
 });
 document.getElementById('startWaveBtn').onclick=function(){ audio.kick(); startWave(); };
 document.getElementById('pauseBtn').onclick=function(){ audio.kick(); togglePause(); };
@@ -2249,7 +2503,7 @@ if(sb){
   renderAcct();
 }
 /* =================== END CLOUD LAYER =================== */
-buildShop(); buildDiffSel(); buildMapSel(); reset(); requestAnimationFrame(loop);
+buildShop(); buildDiffSel(); buildMapSel(); buildAbilityBar(); reset(); requestAnimationFrame(loop);
 })();
 </script>
 </body>
